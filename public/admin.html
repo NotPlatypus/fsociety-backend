@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Login | FSociety</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0A0A0A;--surface:#111111;--text:#FFFFFF;--muted:#888888;--primary:#E01B1B;--green:#00FF41;--border:#222222;--font:'Share Tech Mono','Courier New',monospace;--radius:8px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;-webkit-font-smoothing:antialiased;}
+.login-box{width:100%;max-width:420px;}
+.logo{text-align:center;margin-bottom:32px;}
+.logo-text{font-size:1.8rem;color:var(--primary);letter-spacing:3px;font-weight:700;}
+.logo-sub{font-size:0.72rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-top:4px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;}
+.terminal-header{font-size:0.72rem;color:var(--muted);margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.terminal-header span{color:var(--green);}
+.form-group{margin-bottom:18px;}
+label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:6px;}
+input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:16px;padding:13px 14px;min-height:48px;transition:border-color 0.2s;}
+input:focus{outline:none;border-color:var(--green);}
+input::placeholder{color:#444;}
+.btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);font-family:var(--font);font-size:0.9rem;font-weight:700;letter-spacing:0.05em;cursor:pointer;transition:background 0.2s;min-height:48px;margin-top:8px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.btn:hover{background:#B01515;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.error{margin-top:14px;padding:12px 14px;background:rgba(224,27,27,0.08);border:1px solid rgba(224,27,27,0.3);border-radius:var(--radius);font-size:0.82rem;color:var(--primary);display:none;}
+.back{text-align:center;margin-top:20px;font-size:0.78rem;}
+.back a{color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.back a:hover{color:var(--green);}
+</style>
+</head>
+<body>
+<div class="login-box">
+  <div class="logo">
+    <div class="logo-text">FSociety</div>
+    <div class="logo-sub">Admin Access</div>
+  </div>
+  <div class="card">
+    <div class="terminal-header">
+      <span>root@fsociety:~$</span> ./admin_login.sh
+    </div>
+    <form id="login-form" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter username" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn" id="login-btn">Access Dashboard</button>
+      <div class="error" id="login-error"></div>
+    </form>
+  </div>
+  <div class="back"><a href="https://notplatypus.github.io/fsociety/">← Back to FSociety</a></div>
+</div>
+
+<script>
+// Redirect if already logged in
+fetch('/api/admin/check', { credentials: 'include' })
+  .then(r => r.json())
+  .then(d => { if (d.loggedIn) location.href = '/dashboard.html'; })
+  .catch(() => {});
+
+document.getElementById('login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  err.style.display = 'none';
+
+  if (!username || !password) {
+    err.textContent = '> ERROR: Username and password required.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '> AUTHENTICATING...';
+
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      location.href = '/dashboard.html';
+    } else {
+      err.textContent = '> ACCESS DENIED: ' + (data.error || 'Invalid credentials');
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Access Dashboard';
+    }
+  } catch (e) {
+    err.textContent = '> ERROR: Connection failed. Try again.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Access Dashboard';
+  }
+});
+</script>
+</body>
+</html>
