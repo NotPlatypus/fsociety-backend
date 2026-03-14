@@ -25,7 +25,7 @@ app.use(limiter);
 
 const loginLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 5,
+  max: 20,
   message: { error: 'Too many login attempts, please wait.' }
 });
 
