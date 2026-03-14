@@ -16,7 +16,7 @@ async function sendEmail(to, subject, html) {
 }
 
 const BUSINESS_NAME = 'FSociety Computer Services';
-const BUSINESS_PHONE = '(064) 032-8443';
+const BUSINESS_PHONE = '(202) 555-0173';
 const PRIMARY_COLOR = '#E01B1B';
 const GREEN_COLOR = '#00FF41';
 const SENDER_EMAIL = 'fsociety.service.nyc@gmail.com';
@@ -28,7 +28,7 @@ function baseLayout(content) {
       <div style="background:#111111;border-bottom:3px solid ${PRIMARY_COLOR};padding:28px 32px;display:flex;align-items:center;gap:12px;">
         <div>
           <div style="font-size:20px;font-weight:700;color:${PRIMARY_COLOR};letter-spacing:2px;">${BUSINESS_NAME}</div>
-          <div style="font-size:11px;color:#888888;letter-spacing:1px;text-transform:uppercase;">New York, NY · (064) 032-8443</div>
+          <div style="font-size:11px;color:#888888;letter-spacing:1px;text-transform:uppercase;">New York, NY · (202) 555-0173</div>
         </div>
       </div>
       <div style="padding:32px;background:#0A0A0A;">${content}</div>
@@ -73,7 +73,7 @@ async function sendBookingRequestToUser(booking) {
           ['Address', booking.address],
           ...(booking.notes ? [['Notes', booking.notes]] : [])
         ])}
-        <p style="color:#888888;font-size:13px;">Questions? Call us: <a href="tel:+10640328443" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
+        <p style="color:#888888;font-size:13px;">Questions? Call us: <a href="tel:+12025550173" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
       `)
     );
   } catch (e) { console.error('Email error (user request):', e.message); }
@@ -120,7 +120,7 @@ async function sendConfirmationToUser(booking) {
           ['Time', booking.time],
           ['Address', booking.address]
         ])}
-        <p style="color:#888888;font-size:13px;">Need to reschedule? Call us: <a href="tel:+10640328443" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
+        <p style="color:#888888;font-size:13px;">Need to reschedule? Call us: <a href="tel:+12025550173" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
       `)
     );
   } catch (e) { console.error('Email error (confirm):', e.message); }
@@ -135,7 +135,7 @@ async function sendCancellationToUser(booking) {
         <p style="color:${PRIMARY_COLOR};font-size:12px;margin-bottom:20px;">&gt; STATUS: CANCELLED</p>
         <h2 style="color:#FFFFFF;font-size:20px;margin:0 0 12px;">Appointment Cancelled</h2>
         <p style="color:#888888;font-size:14px;line-height:1.7;margin-bottom:0;">Hi ${booking.name}, your booking for <strong style="color:#FFFFFF;">${booking.date} at ${booking.time}</strong> has been cancelled.</p>
-        <p style="color:#888888;font-size:14px;margin-top:16px;">To rebook or ask questions, please call us: <a href="tel:+10640328443" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
+        <p style="color:#888888;font-size:14px;margin-top:16px;">To rebook or ask questions, please call us: <a href="tel:+12025550173" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
       `)
     );
   } catch (e) { console.error('Email error (cancel):', e.message); }
