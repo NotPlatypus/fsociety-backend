@@ -34,7 +34,7 @@ function baseLayout(content) {
       <div style="padding:32px;background:#0A0A0A;">${content}</div>
       <div style="background:#111111;border-top:1px solid #222222;padding:20px 32px;text-align:center;">
         <p style="color:#555555;margin:0;font-size:12px;">
-          ${BUSINESS_NAME} · 135 East 57th Street, New York, NY 10022<br>
+          ${BUSINESS_NAME} · 701 Lexington Avenue, New York, NY 10022<br>
           <a href="mailto:${SENDER_EMAIL}" style="color:#555555;">${SENDER_EMAIL}</a>
         </p>
       </div>
