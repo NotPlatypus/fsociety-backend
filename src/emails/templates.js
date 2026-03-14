@@ -1,14 +1,19 @@
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp-relay.brevo.com',
-  port: 465,
-  secure: true,  // dodaj ovo
-  auth: {
-    user: process.env.BREVO_SMTP_USER,
-    pass: process.env.BREVO_SMTP_PASS
-  }
-});
+async function sendEmail(to, subject, html) {
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': process.env.BREVO_API_KEY
+    },
+    body: JSON.stringify({
+      sender: { name: BUSINESS_NAME, email: SENDER_EMAIL },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html
+    })
+  });
+  if (!res.ok) throw new Error(await res.text());
+}
 
 const BUSINESS_NAME = 'FSociety Computer Services';
 const BUSINESS_PHONE = '(064) 032-8443';
@@ -54,11 +59,10 @@ function statusBox(color, label, rows) {
 
 async function sendBookingRequestToUser(booking) {
   try {
-    await transporter.sendMail({
-      from: `${BUSINESS_NAME} <${SENDER_EMAIL}>`,
-      to: booking.email,
-      subject: `[PENDING] Booking Request Received — ${BUSINESS_NAME}`,
-      html: baseLayout(`
+    await sendEmail(
+      booking.email,
+      `[PENDING] Booking Request Received — ${BUSINESS_NAME}`,
+      baseLayout(`
         <p style="color:${GREEN_COLOR};font-size:12px;margin-bottom:20px;">&gt; STATUS: PENDING CONFIRMATION</p>
         <h2 style="color:#FFFFFF;font-size:20px;margin:0 0 12px;">Hi ${booking.name},</h2>
         <p style="color:#888888;font-size:14px;line-height:1.7;margin-bottom:0;">We received your booking request and will confirm it shortly. You'll get another email once confirmed.</p>
@@ -71,17 +75,16 @@ async function sendBookingRequestToUser(booking) {
         ])}
         <p style="color:#888888;font-size:13px;">Questions? Call us: <a href="tel:+10640328443" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
       `)
-    });
+    );
   } catch (e) { console.error('Email error (user request):', e.message); }
 }
 
 async function sendBookingNotificationToAdmin(booking) {
   try {
-    await transporter.sendMail({
-      from: `${BUSINESS_NAME} Booking <${SENDER_EMAIL}>`,
-      to: ADMIN_EMAIL,
-      subject: `[NEW BOOKING] ${booking.name} — ${booking.date} at ${booking.time}`,
-      html: baseLayout(`
+    await sendEmail(
+      ADMIN_EMAIL,
+      `[NEW BOOKING] ${booking.name} — ${booking.date} at ${booking.time}`,
+      baseLayout(`
         <p style="color:${GREEN_COLOR};font-size:12px;margin-bottom:20px;">&gt; NEW_BOOKING_REQUEST</p>
         <h2 style="color:#FFFFFF;font-size:20px;margin:0 0 20px;">New Booking Request</h2>
         ${statusBox(GREEN_COLOR, 'CLIENT_INFO', [
@@ -98,17 +101,16 @@ async function sendBookingNotificationToAdmin(booking) {
         ])}
         <p style="color:#888888;font-size:13px;">Log into the <strong style="color:#FFFFFF;">admin dashboard</strong> to confirm or cancel this booking.</p>
       `)
-    });
+    );
   } catch (e) { console.error('Email error (admin notify):', e.message); }
 }
 
 async function sendConfirmationToUser(booking) {
   try {
-    await transporter.sendMail({
-      from: `${BUSINESS_NAME} <${SENDER_EMAIL}>`,
-      to: booking.email,
-      subject: `[CONFIRMED] Appointment Confirmed — ${BUSINESS_NAME}`,
-      html: baseLayout(`
+    await sendEmail(
+      booking.email,
+      `[CONFIRMED] Appointment Confirmed — ${BUSINESS_NAME}`,
+      baseLayout(`
         <p style="color:${GREEN_COLOR};font-size:12px;margin-bottom:20px;">&gt; STATUS: CONFIRMED</p>
         <h2 style="color:#FFFFFF;font-size:20px;margin:0 0 12px;">Appointment Confirmed</h2>
         <p style="color:#888888;font-size:14px;line-height:1.7;margin-bottom:0;">Hi ${booking.name}, your appointment has been confirmed. We look forward to seeing you!</p>
@@ -120,23 +122,22 @@ async function sendConfirmationToUser(booking) {
         ])}
         <p style="color:#888888;font-size:13px;">Need to reschedule? Call us: <a href="tel:+10640328443" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
       `)
-    });
+    );
   } catch (e) { console.error('Email error (confirm):', e.message); }
 }
 
 async function sendCancellationToUser(booking) {
   try {
-    await transporter.sendMail({
-      from: `${BUSINESS_NAME} <${SENDER_EMAIL}>`,
-      to: booking.email,
-      subject: `[CANCELLED] Appointment Cancelled — ${BUSINESS_NAME}`,
-      html: baseLayout(`
+    await sendEmail(
+      booking.email,
+      `[CANCELLED] Appointment Cancelled — ${BUSINESS_NAME}`,
+      baseLayout(`
         <p style="color:${PRIMARY_COLOR};font-size:12px;margin-bottom:20px;">&gt; STATUS: CANCELLED</p>
         <h2 style="color:#FFFFFF;font-size:20px;margin:0 0 12px;">Appointment Cancelled</h2>
         <p style="color:#888888;font-size:14px;line-height:1.7;margin-bottom:0;">Hi ${booking.name}, your booking for <strong style="color:#FFFFFF;">${booking.date} at ${booking.time}</strong> has been cancelled.</p>
         <p style="color:#888888;font-size:14px;margin-top:16px;">To rebook or ask questions, please call us: <a href="tel:+10640328443" style="color:${PRIMARY_COLOR};">${BUSINESS_PHONE}</a></p>
       `)
-    });
+    );
   } catch (e) { console.error('Email error (cancel):', e.message); }
 }
 
